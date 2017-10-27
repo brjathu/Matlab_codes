@@ -1,0 +1,296 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>FilterDesign</title><meta name="generator" content="MATLAB 9.1"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2016-12-03"><meta name="DC.source" content="FilterDesign.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#1">SPECIFICATIONS</a></li><li><a href="#2">Kaiser window Design</a></li><li><a href="#3">Frequency responce</a></li><li><a href="#4">TESTING</a></li></ul></div><h2 id="1">SPECIFICATIONS</h2><pre class="codeinput">Ap=0.1;
+Aa=20;
+wa1=300;
+wp1=400;
+wp2=700;
+wa2=850;
+
+Bt=min(abs(wp1-wa1),abs(wp2-wa2));
+wc1=wp1-Bt/2;
+wc2=wp2+Bt/2;
+
+ws=2200;
+T=2*pi/ws;
+
+N=21;
+samp=1001;
+</pre><h2 id="2">Kaiser window Design</h2><pre class="codeinput">deltaP=(10^(0.05*Ap)-1)/(10^(0.05*Ap)+1);
+deltaA=10^(-0.05*Aa);
+
+delta=min(deltaP,deltaA)
+Aa=-20*log10(delta)
+
+
+alpha= 0*(Aa&lt;=21)+  (0.5842*(Aa - 21)^(0.4) + 0.07886*(Aa - 21))*(Aa&lt;=50 &amp; Aa&gt;21) + 0.1102*(Aa - 8.7)*(Aa&gt;50)
+D= 0.9222 * (Aa&lt;=21)+ (Aa-7.95)/14.36*(Aa&gt;21)
+N=floor(ws*D/Bt+1)
+winKaiser=@(n) Kaiser(N,alpha,n);
+
+
+w=-ws/2:0.01:ws/2;
+n=-(N-1)/2:(N-1)/2;
+
+<span class="comment">%given ideal frequency responce</span>
+Hone=@(w) ( 1*(abs(w))&lt;=wc2 &amp; abs(w)&gt;=wc1 ).*(w&lt;=ws/2 &amp; w&gt;=-ws/2);
+H=@(w) Hone(w-(round(w/ws))*ws);
+
+<span class="comment">%impluse responce function</span>
+h=@(n) sinc(wc2*n*T/pi)/pi*T*wc2-sinc(wc1*n*T/pi)/pi*T*wc1;
+ht=@(n) h(n).*winKaiser(n);
+</pre><pre class="codeoutput">
+delta =
+
+    0.0058
+
+
+Aa =
+
+   44.7970
+
+
+alpha =
+
+    3.9524
+
+
+D =
+
+    2.5659
+
+
+N =
+
+    57
+
+</pre><h2 id="3">Frequency responce</h2><pre class="codeinput">Hw=zeros(1,samp);
+<span class="keyword">parfor</span> i=1:samp
+    x=i-(samp+1)/2;
+    <span class="keyword">for</span> k=-(N-1)/2:(N-1)/2
+        Hw(i)=Hw(i)+ht(k)*exp(-1j*(x/(samp-1)*ws)*k*T);
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+
+
+
+subplot(2,2,1)
+plot(w,H(w),<span class="string">'k'</span>,<span class="string">'LineWidth'</span>,1.5);title(<span class="string">'Ideal Frequency Response'</span>);xlabel(<span class="string">'Frequency'</span>);ylabel(<span class="string">'H(w)'</span>);
+
+subplot(2,2,2)
+stem(n,abs(ht(n)),<span class="string">'k'</span>,<span class="string">'LineWidth'</span>,1.5);title(<span class="string">'Impluse Responce'</span>);xlabel(<span class="string">'Frequency'</span>);ylabel(<span class="string">'h(nT)'</span>);
+
+subplot(2,2,3)
+plot(((1:samp)-(1+samp)/2)/(samp-1)*ws,mag2db(abs(Hw)),<span class="string">'k'</span>,<span class="string">'LineWidth'</span>,1.5);title(<span class="string">'Frequency Response'</span>);xlabel(<span class="string">'Frequency'</span>);ylabel(<span class="string">'H(w)'</span>);
+
+passBand=ceil((ws/2+wp1)/ws*(samp)):floor((ws/2+wp2)/ws*(samp));
+stopBand1=ceil((ws/2-wa1)/ws*(samp)):floor((ws/2+wa1)/ws*(samp));
+stopBand2=ceil((ws/2+wa2)/ws*(samp)):floor((ws/2+ws/2)/ws*(samp));
+
+
+a=min(abs(Hw(passBand)));
+b=max(abs(Hw(passBand)));
+
+Aa=mag2db(max(abs(Hw(stopBand2))))
+Ap=20*log10(b/a)
+</pre><pre class="codeoutput">
+Aa =
+
+  -51.1358
+
+
+Ap =
+
+    0.0984
+
+</pre><img vspace="5" hspace="5" src="FilterDesign_01.png" alt=""> <h2 id="4">TESTING</h2><pre class="codeinput">figure,
+n0=(1:1001);
+
+x=sin((0+wa1)/2*n0*T)+sin((wp1+wp2)/2*n0*T)+sin((wa2+ws/2)/2*n0*T);
+
+out2=conv(x,ht(n),<span class="string">'same'</span>);
+
+Xw=fft(x);
+Yw=fft(out2);
+
+subplot(2,2,1)
+plot(n0,x,<span class="string">'k'</span>,<span class="string">'LineWidth'</span>,1);title(<span class="string">'Input Signal'</span>);xlabel(<span class="string">'Frequency'</span>);ylabel(<span class="string">'x(nT)'</span>);
+
+subplot(2,2,2)
+plot(n0,out2,<span class="string">'k'</span>,<span class="string">'LineWidth'</span>,0.7);title(<span class="string">'Output signal'</span>);xlabel(<span class="string">'Frequency'</span>);ylabel(<span class="string">'y(nT)'</span>);
+
+subplot(2,2,3)
+plot((n0-(501))/1000*ws,abs(Xw),<span class="string">'k'</span>,<span class="string">'LineWidth'</span>,1.5);title(<span class="string">'Frequency Response of input signal'</span>);xlabel(<span class="string">'Frequency'</span>);ylabel(<span class="string">'X(w)'</span>);
+
+subplot(2,2,4)
+plot((n0-(501))/1000*ws,abs(Yw),<span class="string">'k'</span>,<span class="string">'LineWidth'</span>,1.5);title(<span class="string">'Frequency Response of output signal'</span>);xlabel(<span class="string">'Frequency'</span>);ylabel(<span class="string">'YS(w)'</span>);
+</pre><img vspace="5" hspace="5" src="FilterDesign_02.png" alt=""> <p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2016b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% SPECIFICATIONS
+Ap=0.1;
+Aa=20;
+wa1=300;
+wp1=400;
+wp2=700;
+wa2=850;
+
+Bt=min(abs(wp1-wa1),abs(wp2-wa2));
+wc1=wp1-Bt/2;
+wc2=wp2+Bt/2;
+
+ws=2200;
+T=2*pi/ws;
+
+N=21;
+samp=1001;
+
+%% Kaiser window Design
+deltaP=(10^(0.05*Ap)-1)/(10^(0.05*Ap)+1);
+deltaA=10^(-0.05*Aa);
+
+delta=min(deltaP,deltaA)
+Aa=-20*log10(delta)
+
+
+alpha= 0*(Aa<=21)+  (0.5842*(Aa - 21)^(0.4) + 0.07886*(Aa - 21))*(Aa<=50 & Aa>21) + 0.1102*(Aa - 8.7)*(Aa>50)
+D= 0.9222 * (Aa<=21)+ (Aa-7.95)/14.36*(Aa>21)
+N=floor(ws*D/Bt+1)
+winKaiser=@(n) Kaiser(N,alpha,n);
+
+
+w=-ws/2:0.01:ws/2;
+n=-(N-1)/2:(N-1)/2;
+
+%given ideal frequency responce
+Hone=@(w) ( 1*(abs(w))<=wc2 & abs(w)>=wc1 ).*(w<=ws/2 & w>=-ws/2);
+H=@(w) Hone(w-(round(w/ws))*ws);
+
+%impluse responce function
+h=@(n) sinc(wc2*n*T/pi)/pi*T*wc2-sinc(wc1*n*T/pi)/pi*T*wc1;
+ht=@(n) h(n).*winKaiser(n);
+
+
+%% Frequency responce
+Hw=zeros(1,samp);  
+parfor i=1:samp
+    x=i-(samp+1)/2;
+    for k=-(N-1)/2:(N-1)/2
+        Hw(i)=Hw(i)+ht(k)*exp(-1j*(x/(samp-1)*ws)*k*T);
+    end
+end
+
+
+
+subplot(2,2,1)
+plot(w,H(w),'k','LineWidth',1.5);title('Ideal Frequency Response');xlabel('Frequency');ylabel('H(w)');
+
+subplot(2,2,2)
+stem(n,abs(ht(n)),'k','LineWidth',1.5);title('Impluse Responce');xlabel('Frequency');ylabel('h(nT)');
+
+subplot(2,2,3)
+plot(((1:samp)-(1+samp)/2)/(samp-1)*ws,mag2db(abs(Hw)),'k','LineWidth',1.5);title('Frequency Response');xlabel('Frequency');ylabel('H(w)');
+
+passBand=ceil((ws/2+wp1)/ws*(samp)):floor((ws/2+wp2)/ws*(samp));
+stopBand1=ceil((ws/2-wa1)/ws*(samp)):floor((ws/2+wa1)/ws*(samp));
+stopBand2=ceil((ws/2+wa2)/ws*(samp)):floor((ws/2+ws/2)/ws*(samp));
+
+
+a=min(abs(Hw(passBand)));
+b=max(abs(Hw(passBand)));
+
+Aa=mag2db(max(abs(Hw(stopBand2))))
+Ap=20*log10(b/a)
+
+
+%% TESTING 
+figure,
+n0=(1:1001);
+
+x=sin((0+wa1)/2*n0*T)+sin((wp1+wp2)/2*n0*T)+sin((wa2+ws/2)/2*n0*T);
+
+out2=conv(x,ht(n),'same');
+
+Xw=fft(x);
+Yw=fft(out2);
+
+subplot(2,2,1)
+plot(n0,x,'k','LineWidth',1);title('Input Signal');xlabel('Frequency');ylabel('x(nT)');
+
+subplot(2,2,2)
+plot(n0,out2,'k','LineWidth',0.7);title('Output signal');xlabel('Frequency');ylabel('y(nT)');
+
+subplot(2,2,3)
+plot((n0-(501))/1000*ws,abs(Xw),'k','LineWidth',1.5);title('Frequency Response of input signal');xlabel('Frequency');ylabel('X(w)');
+
+subplot(2,2,4)
+plot((n0-(501))/1000*ws,abs(Yw),'k','LineWidth',1.5);title('Frequency Response of output signal');xlabel('Frequency');ylabel('YS(w)');
+
+
+##### SOURCE END #####
+--></body></html>
